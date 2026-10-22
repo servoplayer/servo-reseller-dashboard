@@ -286,7 +286,7 @@ export default function Overview() {
                   </TableMessage>
                 ) : list.length === 0 ? (
                   <TableMessage cols={4}>
-                    <EmptyState title="No activations yet" description="Your customers appear here after their first activation." />
+                    <EmptyState title="No subscriptions found yet" description="Your customers appear here after their first activation." />
                   </TableMessage>
                 ) : (
                   list.slice(0, 8).map((s, i) => {

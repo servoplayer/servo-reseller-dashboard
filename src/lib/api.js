@@ -66,3 +66,28 @@ export const qs = (params) => {
   const str = search.toString()
   return str ? `?${str}` : ''
 }
+
+// The subscription-list endpoints answer `404 { message: "No subscriptions found yet" }`
+// when the collection is simply empty. Only that exact reply is a valid empty
+// state; any other 404 (unknown route, missing record, different message) is
+// still a real error.
+const NO_SUBSCRIPTIONS = /no subscriptions? (were )?found/i
+
+export const isNoSubscriptionsResponse = (res) =>
+  !res.ok && res.status === 404 && NO_SUBSCRIPTIONS.test(res.data?.message ?? '')
+
+/**
+ * For subscription-list requests only: normalizes the "no subscriptions"
+ * 404 into the same shape as a successful page with zero records, so callers
+ * render their empty state instead of an error. Everything else passes through.
+ */
+export function emptyListOnNoSubscriptions(res, listKey = 'subscriptions') {
+  if (!isNoSubscriptionsResponse(res)) return res
+  return {
+    ok: true,
+    empty: true,
+    status: res.status,
+    message: res.data.message,
+    data: { [listKey]: [], page: 1, totalPages: 0 },
+  }
+}

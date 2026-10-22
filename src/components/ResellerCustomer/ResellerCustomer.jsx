@@ -96,7 +96,7 @@ export default function ResellerCustomer() {
                 ) : (
                   <EmptyState
                     icon={Users}
-                    title="No customers yet"
+                    title="No subscriptions found yet"
                     description="Activate your first customer's device to see it here."
                     action={<Button size="sm" icon={Plus} onClick={() => setActivate({ open: true, mac: '' })}>New activation</Button>}
                   />
