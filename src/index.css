@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Servo design tokens.
+ * Sampled from src/assets/Image/servologo.png:
+ *   #0056BC  Servo blue  – dominant body of the play mark
+ *   #11B1F0  Sky         – bright end of the gradient (tip)
+ *   #022E5F  Deep navy   – shadow of the folded corner
+ *   #1446A0  Indigo      – mid-tone of the fold
+ * Values are space-separated RGB so Tailwind can apply opacity modifiers.
+ */
+:root {
+  --canvas: 243 246 250;
+  --surface: 255 255 255;
+  --surface-2: 247 249 252;
+  --line: 223 230 239;
+  --line-strong: 199 210 224;
+  --fg: 11 27 46;
+  --muted: 84 99 120;
+  --subtle: 102 116 138;
+  --shadow: 2 46 95;
+
+  --brand: 0 86 188;
+  --brand-hover: 0 71 156;
+  --brand-soft: 230 239 250;
+  --brand-fg: 255 255 255;
+  --sky: 17 177 240;
+  --navy: 2 46 95;
+  --navy-2: 7 58 115;
+  --navy-line: 20 70 160;
+
+  --success: 4 120 87;
+  --success-soft: 222 245 236;
+  --warning: 161 83 4;
+  --warning-soft: 254 241 220;
+  --danger: 196 38 52;
+  --danger-hover: 165 28 41;
+  --danger-soft: 253 230 232;
+  --info: 0 86 188;
+  --info-soft: 230 239 250;
+  --attention: 251 191 36;
+
+  color-scheme: light;
+}
+
+.dark {
+  --canvas: 6 15 28;
+  --surface: 12 25 43;
+  --surface-2: 17 33 55;
+  --line: 30 50 78;
+  --line-strong: 45 70 104;
+  --fg: 230 237 246;
+  --muted: 156 172 194;
+  --subtle: 112 130 155;
+  --shadow: 0 0 0;
+
+  --brand: 64 145 240;
+  --brand-hover: 98 165 245;
+  --brand-soft: 14 36 68;
+  --brand-fg: 4 18 36;
+  --sky: 56 196 245;
+  --navy: 4 16 32;
+  --navy-2: 10 30 56;
+  --navy-line: 26 52 88;
+
+  --success: 52 199 140;
+  --success-soft: 10 52 40;
+  --warning: 245 176 70;
+  --warning-soft: 60 40 10;
+  --danger: 248 113 120;
+  --danger-hover: 252 140 146;
+  --danger-soft: 64 20 26;
+  --info: 98 165 245;
+  --info-soft: 14 36 68;
+  --attention: 251 191 36;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-fg font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--brand));
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgb(var(--brand) / 0.18);
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: rgb(var(--brand));
+  }
+}
+
+@layer components {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--line-strong)) transparent;
+  }
+}
+
+/* ---------- react-toastify, themed with Servo tokens ----------
+ * react-toastify injects its own stylesheet at runtime, so these selectors are
+ * slightly more specific to win regardless of load order. */
+html:root {
+  --toastify-color-light: rgb(var(--surface));
+  --toastify-color-dark: rgb(var(--surface));
+  --toastify-text-color-light: rgb(var(--fg));
+  --toastify-text-color-dark: rgb(var(--fg));
+  --toastify-color-info: rgb(var(--info));
+  --toastify-color-success: rgb(var(--success));
+  --toastify-color-warning: rgb(var(--warning));
+  --toastify-color-error: rgb(var(--danger));
+  --toastify-font-family: inherit;
+  --toastify-toast-min-height: 56px;
+}
+
+.Toastify .Toastify__toast {
+  border: 1px solid rgb(var(--line));
+  border-radius: 10px;
+  box-shadow: 0 12px 32px -8px rgb(var(--shadow) / 0.28);
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.Toastify .Toastify__close-button {
+  color: rgb(var(--muted));
+  opacity: 1;
+}
