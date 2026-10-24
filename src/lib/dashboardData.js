@@ -1,16 +1,24 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useResource } from './resource'
-import { authApi, customersApi, statsApi, subResellersApi } from './services'
+import { authApi, customersApi, distributorApi, statsApi, subResellersApi } from './services'
 import { daysUntil, EXPIRING_SOON_DAYS, isLifetime } from './format'
+import { isDistributorManager } from './role'
+
+const SKIPPED = () => Promise.resolve({ ok: true, status: 200, data: null, message: '' })
 
 // Shared read models. Keys are prefixes used by `invalidate()` after mutations.
-export const useInfo = () => useResource('info', authApi.info)
-export const useCustomersFirstPage = () => useResource('customers:1', () => customersApi.list(1))
+// A distributor manager has no customers: its profile comes from /distributor/info
+// and customer requests are skipped (the API would refuse them anyway).
+export const useInfo = () => useResource('info', isDistributorManager() ? distributorApi.info : authApi.info)
+export const useCustomersFirstPage = () => {
+  const skip = isDistributorManager()
+  return useResource(skip ? 'skip:customers' : 'customers:1', skip ? SKIPPED : () => customersApi.list(1))
+}
 export const useStats = () => useResource('stats', statsApi.mine)
+export const useManagedResellers = () => useResource('dm-resellers', distributorApi.resellers)
 
 /** Exact total from a paged list response (`totalItems`), when the API sent one. */
 export const totalOf = (data) => data?.totalItems ?? data?.total ?? data?.count
-const SKIPPED = () => Promise.resolve({ ok: true, status: 200, data: null, message: '' })
 // Pass enabled=false to skip the request (sub-resellers cannot have sub-resellers).
 export const useSubResellers = (enabled = true) =>
   useResource(enabled ? 'subresellers' : 'skip:subresellers', enabled ? subResellersApi.list : SKIPPED)

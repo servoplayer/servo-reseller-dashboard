@@ -29,6 +29,21 @@ export const statsApi = {
   mine: (opts) => request('/reseller/stats', opts),
 }
 
+// Credit history of the signed-in reseller (scoped by the token server-side).
+export const creditsApi = {
+  mine: (page, opts) => request(`/reseller/creditTransactions${qs({ page })}`, opts),
+}
+
+// Distributor manager role. The API refuses these for every other account.
+export const distributorApi = {
+  info: (opts) => request('/distributor/info', opts),
+  resellers: (opts) => request('/distributor/resellers', opts),
+  transactions: (page, resellerId, opts) => request(`/distributor/transactions${qs({ page, resellerId })}`, opts),
+  // idempotencyKey makes a retried or double-clicked submission safe: the API applies it once.
+  recharge: (resellerId, amount, idempotencyKey, note) =>
+    request('/distributor/recharge', { method: 'POST', body: { resellerId, amount, idempotencyKey, note: note || undefined } }),
+}
+
 export const subResellersApi = {
   list: (opts) => request('/reseller/getSubReseller', opts),
   create: (body) => request('/reseller/addSubReseller', { method: 'POST', body }),

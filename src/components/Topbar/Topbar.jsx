@@ -4,7 +4,7 @@ import { AlertTriangle, Bell, CheckCheck, ChevronDown, ChevronRight, CircleAlert
 import Popover from '../ui/Popover'
 import { getPageMeta } from '../Sidebar/navigation'
 import { useShell } from '../LayOut/ShellContext'
-import { roleLabel } from '../../lib/role'
+import { isDistributorManager, roleLabel } from '../../lib/role'
 import { formatNumber } from '../../lib/format'
 import { useTheme } from '../../lib/theme'
 import { logOut } from '../../lib/api'
@@ -207,6 +207,8 @@ export default function Topbar({ onOpenMobile }) {
   const [params] = useSearchParams()
   const meta = getPageMeta(pathname, params)
   const { dark, toggle } = useTheme()
+  // A distributor manager has no customers, so customer search and alerts are not shown.
+  const manager = isDistributorManager()
 
   useEffect(() => {
     document.title = meta.title && meta.title !== 'Servo' ? `${meta.title} · Servo Reseller` : 'Servo Reseller'
@@ -238,17 +240,19 @@ export default function Topbar({ onOpenMobile }) {
           <p className="truncate text-[15px] font-bold text-fg sm:text-base">{meta.title}</p>
         </div>
 
-        <MacSearch />
+        {!manager && <MacSearch />}
 
         <div className="flex items-center gap-0.5 sm:gap-1">
-          <Link to="/layout/resellerCustomer" className={cx(iconBtn, 'md:hidden')} aria-label="Find a customer">
-            <Search size={18} />
-          </Link>
+          {!manager && (
+            <Link to="/layout/resellerCustomer" className={cx(iconBtn, 'md:hidden')} aria-label="Find a customer">
+              <Search size={18} />
+            </Link>
+          )}
           <CreditPill />
           <button type="button" onClick={toggle} className={iconBtn} aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'}>
             {dark ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <AlertsMenu />
+          {!manager && <AlertsMenu />}
           <span className="mx-1 hidden h-6 w-px bg-line sm:block" aria-hidden="true" />
           <UserMenu />
         </div>

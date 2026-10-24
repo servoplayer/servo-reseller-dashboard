@@ -4,9 +4,12 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Login from './components/Login/Login'
 import { ToastContainer } from 'react-toastify'
 import ProtectedRoutes from './components/ProtectedRoutes/ProtectedRoutes'
+import RoleGate from './components/ProtectedRoutes/RoleGate'
 import SubReseller from './components/SubReseller/SubReseller'
 import Provider from './components/Provider/Provider'
 import Overview from './components/Overview/Overview'
+import ManagerResellers from './components/ManagerResellers/ManagerResellers'
+import CreditHistory from './components/CreditHistory/CreditHistory'
 
 const routes = createBrowserRouter([
 
@@ -30,7 +33,9 @@ const routes = createBrowserRouter([
         index: true,
         element:
           <ProtectedRoutes>
-            <Overview />
+            <RoleGate only="reseller">
+              <Overview />
+            </RoleGate>
           </ProtectedRoutes>
         ,
       },
@@ -38,20 +43,41 @@ const routes = createBrowserRouter([
         path: "resellerCustomer",
         element:
           <ProtectedRoutes>
-            <ResellerCustomer />
+            <RoleGate only="reseller">
+              <ResellerCustomer />
+            </RoleGate>
           </ProtectedRoutes>
         ,
       },
       {
         path: "provider",
         element: <ProtectedRoutes>
-          <Provider />
+          <RoleGate only="reseller">
+            <Provider />
+          </RoleGate>
         </ProtectedRoutes>
       },
       {
         path: "subReseller",
         element: <ProtectedRoutes>
-          <SubReseller />
+          <RoleGate only="reseller">
+            <SubReseller />
+          </RoleGate>
+        </ProtectedRoutes>
+      },
+      {
+        path: "resellers",
+        element: <ProtectedRoutes>
+          <RoleGate only="manager">
+            <ManagerResellers />
+          </RoleGate>
+        </ProtectedRoutes>
+      },
+      {
+        // Both roles: managers see the full ledger, resellers their own balance changes.
+        path: "credit-history",
+        element: <ProtectedRoutes>
+          <CreditHistory />
         </ProtectedRoutes>
       },
     ]
