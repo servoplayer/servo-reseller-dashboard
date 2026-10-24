@@ -74,6 +74,13 @@ describe('recharge input rules', () => {
 })
 
 describe('API calls', () => {
+  it('creating a reseller sends only account fields and the starting credits', async () => {
+    await distributorApi.createReseller({ userName: 'Shop', email: 's@x.io', password: 'secret1', initialCredits: 10, idempotencyKey: 'key-12345678' })
+    assert.ok(calls[0].url.endsWith('/distributor/createReseller'))
+    assert.equal(calls[0].init.method, 'POST')
+    assert.deepEqual(JSON.parse(calls[0].init.body), { userName: 'Shop', email: 's@x.io', password: 'secret1', initialCredits: 10, idempotencyKey: 'key-12345678' })
+  })
+
   it('recharge posts a number amount with the idempotency key and the token', async () => {
     await distributorApi.recharge('r1', 25, 'key-12345678', '')
     assert.ok(calls[0].url.endsWith('/distributor/recharge'))

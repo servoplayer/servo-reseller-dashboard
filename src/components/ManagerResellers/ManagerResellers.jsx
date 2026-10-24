@@ -9,6 +9,7 @@ import { EmptyState, ErrorState } from '../ui/States'
 import { SkeletonRows, Table, TableMessage, Td, Th, Tr } from '../ui/Table'
 import { cx } from '../ui/cx'
 import RechargeDialog from './RechargeDialog'
+import NewResellerDialog from './NewResellerDialog'
 import { useManagedResellers } from '../../lib/dashboardData'
 import { formatDate, formatNumber } from '../../lib/format'
 
@@ -24,6 +25,7 @@ export default function ManagerResellers() {
   const [search, setSearch] = useState('')
   const [type, setType] = useState('all')
   const [target, setTarget] = useState(null)
+  const [creating, setCreating] = useState(false)
 
   const all = resellers.data?.resellers ?? []
   const q = search.trim().toLowerCase()
@@ -40,9 +42,10 @@ export default function ManagerResellers() {
         title="Resellers"
         description={
           resellers.loading || resellers.error
-            ? 'Recharge reseller balances and review their credit history.'
+            ? 'Create resellers, recharge their balances and review their credit history.'
             : `${formatNumber(all.length)} resellers · ${formatNumber(held)} credits held in total`
         }
+        actions={<Button icon={Plus} onClick={() => setCreating(true)}>New reseller</Button>}
       />
 
       <Card>
@@ -88,7 +91,8 @@ export default function ManagerResellers() {
                 <EmptyState
                   icon={Users}
                   title={all.length ? 'No matching resellers' : 'No resellers yet'}
-                  description={all.length ? 'Try a different search or filter.' : 'Resellers created by an administrator appear here.'}
+                  description={all.length ? 'Try a different search or filter.' : 'Create the first reseller to get started.'}
+                  action={all.length ? undefined : <Button size="sm" icon={Plus} onClick={() => setCreating(true)}>New reseller</Button>}
                 />
               </TableMessage>
             ) : (
@@ -145,6 +149,7 @@ export default function ManagerResellers() {
       </Card>
 
       <RechargeDialog reseller={target} onClose={() => setTarget(null)} />
+      <NewResellerDialog open={creating} onClose={() => setCreating(false)} />
     </>
   )
 }

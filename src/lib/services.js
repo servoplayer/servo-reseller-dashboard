@@ -42,6 +42,9 @@ export const distributorApi = {
   // idempotencyKey makes a retried or double-clicked submission safe: the API applies it once.
   recharge: (resellerId, amount, idempotencyKey, note) =>
     request('/distributor/recharge', { method: 'POST', body: { resellerId, amount, idempotencyKey, note: note || undefined } }),
+  // Always creates a regular main reseller; starting credits are added as an audited recharge.
+  createReseller: ({ userName, email, password, initialCredits, idempotencyKey }) =>
+    request('/distributor/createReseller', { method: 'POST', body: { userName, email, password, initialCredits, idempotencyKey } }),
 }
 
 export const subResellersApi = {
