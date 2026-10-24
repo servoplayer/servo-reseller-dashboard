@@ -24,6 +24,11 @@ export const providerApi = {
   generateCode: (playlist) => request('/reseller/generateCode', { method: 'POST', body: { playlist } }),
 }
 
+// Read-only totals for the signed-in account (dashboard-only endpoint; scoped by the token server-side).
+export const statsApi = {
+  mine: (opts) => request('/reseller/stats', opts),
+}
+
 export const subResellersApi = {
   list: (opts) => request('/reseller/getSubReseller', opts),
   create: (body) => request('/reseller/addSubReseller', { method: 'POST', body }),

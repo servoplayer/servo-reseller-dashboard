@@ -50,7 +50,7 @@ export function ActivateDialog({ open, initialMac = '', onClose, onDone }) {
       return
     }
     notify.success(res.message || `Activated ${mac}.`)
-    invalidate('info', 'customers')
+    invalidate('info', 'customers', 'stats')
     onDone?.()
     onClose()
   }

@@ -20,7 +20,8 @@ import { EmptyState, ErrorState, Skeleton } from '../ui/States'
 import { SkeletonRows, Table, TableMessage, Td, Th, Tr } from '../ui/Table'
 import { cx } from '../ui/cx'
 import { useShell } from '../LayOut/ShellContext'
-import { creditsOf, splitByExpiry, useCustomersFirstPage, useInfo, useSubResellers } from '../../lib/dashboardData'
+import { creditsOf, splitByExpiry, totalOf, useCustomersFirstPage, useInfo, useSubResellers } from '../../lib/dashboardData'
+import OverviewCharts from './OverviewCharts'
 import { isFullReseller } from '../../lib/role'
 import {
   customerStatus,
@@ -103,7 +104,7 @@ export default function Overview() {
 
   const list = customers.data?.subscriptions ?? []
   const totalPages = Number(customers.data?.totalPages) || 0
-  const exactTotal = customers.data?.total ?? customers.data?.totalSubscriptions ?? customers.data?.count
+  const exactTotal = totalOf(customers.data)
   const customerValue =
     exactTotal !== undefined ? formatNumber(exactTotal) : `${formatNumber(list.length)}${totalPages > 1 ? '+' : ''}`
   const activeOnPage = list.filter((s) => s.isActive).length
@@ -148,7 +149,13 @@ export default function Overview() {
           loading={customers.loading}
           error={customers.error}
           value={customerValue}
-          sub={totalPages > 1 ? `${totalPages} pages · ${activeOnPage} of ${list.length} active on page 1` : `${activeOnPage} active`}
+          sub={
+            exactTotal !== undefined
+              ? 'Activations on your account'
+              : totalPages > 1
+                ? `${totalPages} pages · ${activeOnPage} of ${list.length} active on page 1`
+                : `${activeOnPage} active`
+          }
         />
         <Kpi
           label="Expiring soon"
@@ -172,6 +179,8 @@ export default function Overview() {
           />
         )}
       </div>
+
+      <OverviewCharts />
 
       <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="space-y-5 xl:col-span-2">

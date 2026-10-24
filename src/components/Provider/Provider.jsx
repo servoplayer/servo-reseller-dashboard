@@ -65,7 +65,7 @@ function GenerateCodeDialog({ open, onClose, onDone }) {
       return
     }
     notify.success(res.message || 'Code generated.')
-    invalidate('info')
+    invalidate('info', 'stats')
     onDone?.()
     onClose()
   }

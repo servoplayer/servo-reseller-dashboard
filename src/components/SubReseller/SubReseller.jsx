@@ -10,7 +10,7 @@ import { SkeletonRows, Table, TableMessage, Td, Th, Tr } from '../ui/Table'
 import { subResellersApi } from '../../lib/services'
 import { invalidate } from '../../lib/resource'
 import { notify } from '../../lib/notify'
-import { useSubResellers } from '../../lib/dashboardData'
+import { creditsOf, useInfo, useSubResellers } from '../../lib/dashboardData'
 import { formatDate, formatNumber } from '../../lib/format'
 
 const EMPTY = { userName: '', email: '', password: '', subscriptionsNum: '' }
@@ -20,6 +20,9 @@ function SubResellerForm({ open, onClose }) {
   const [values, setValues] = useState(EMPTY)
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
+  const info = useInfo()
+  const rawBalance = creditsOf(info.data)
+  const available = rawBalance === undefined || rawBalance === null ? null : Number(rawBalance)
 
   useEffect(() => {
     if (open) {
@@ -39,9 +42,12 @@ function SubResellerForm({ open, onClose }) {
     if (!values.email.trim()) found.email = 'Email is required.'
     else if (!EMAIL_RE.test(values.email.trim())) found.email = 'Enter a valid email address.'
     if (!values.password) found.password = 'Password is required.'
-    if (values.subscriptionsNum === '') found.subscriptionsNum = 'Customer limit is required.'
+    if (values.subscriptionsNum === '') found.subscriptionsNum = 'Initial credits are required.'
     else if (!Number.isInteger(Number(values.subscriptionsNum)) || Number(values.subscriptionsNum) < 0)
       found.subscriptionsNum = 'Use a whole number of 0 or more.'
+    // Same rule the server applies: you can only hand over credits you have.
+    else if (available !== null && Number(values.subscriptionsNum) > available)
+      found.subscriptionsNum = `You have ${formatNumber(available)} credits available.`
     setErrors(found)
     if (Object.keys(found).length) return
 
@@ -89,7 +95,16 @@ function SubResellerForm({ open, onClose }) {
         <Field label="Password" required error={errors.password} hint="They use this to sign in to the reseller portal.">
           {(p) => <PasswordInput {...p} value={values.password} onChange={set('password')} autoComplete="new-password" />}
         </Field>
-        <Field label="Customer limit" required error={errors.subscriptionsNum} hint="Number of customers this sub-reseller can activate.">
+        <Field
+          label="Initial credits"
+          required
+          error={errors.subscriptionsNum}
+          hint={
+            available === null
+              ? 'Moved from your balance to the new account.'
+              : `Moved from your balance · ${formatNumber(available)} credits available`
+          }
+        >
           {(p) => (
             <Input {...p} type="number" min="0" step="1" inputMode="numeric" value={values.subscriptionsNum} onChange={set('subscriptionsNum')} className="tabular" />
           )}
@@ -141,7 +156,7 @@ export default function SubReseller() {
           <thead>
             <tr>
               <Th>Sub-reseller</Th>
-              <Th align="right">Customer limit</Th>
+              <Th align="right">Credits</Th>
               <Th className="hidden sm:table-cell">Created</Th>
             </tr>
           </thead>
